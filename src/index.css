@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-retro-pink font-mono text-retro-black min-h-screen;
+    background-image: radial-gradient(#000 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}
+
+@layer components {
+  .btn-retro {
+    @apply px-6 py-2 bg-retro-beige border-2 border-retro-black shadow-retro 
+           hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-retro-sm 
+           transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none 
+           font-bold text-sm uppercase tracking-wider;
+  }
+  
+  .input-retro {
+    @apply w-full px-4 py-3 bg-white border-2 border-retro-black shadow-retro-sm 
+           focus:outline-none focus:shadow-retro transition-shadow;
+  }
+
+  .card-retro {
+    @apply bg-retro-beige border-2 border-retro-black shadow-retro p-6 rounded-retro;
+  }
+}
