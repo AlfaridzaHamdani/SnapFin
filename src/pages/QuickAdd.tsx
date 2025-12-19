@@ -135,6 +135,13 @@ export default function QuickAdd() {
             </>
           )}
         </button>
+
+        {/* View Report Link */}
+        <div className="text-center mt-2">
+          <a href="/report" className="text-sm font-bold text-gray-500 hover:text-retro-black underline decoration-2 underline-offset-4">
+            VIEW EXPENSE REPORT →
+          </a>
+        </div>
       </form>
     </Layout>
   );
