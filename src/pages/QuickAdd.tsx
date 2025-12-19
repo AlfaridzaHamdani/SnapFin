@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Save, Tag, DollarSign } from 'lucide-react';
 import { saveTransaction } from '../services/googleSheets';
 
 export default function QuickAdd() {
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
-    name: '',
-    type: 'Pengeluaran',
-    amount: ''
+    name: searchParams.get('name') || '',
+    type: (searchParams.get('type') as 'Pengeluaran' | 'Pemasukan') || 'Pengeluaran',
+    amount: searchParams.get('amount') || ''
   });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.amount) return;
+  // Unified submission handler
+  const processSubmission = async (name: string, type: string, amount: string) => {
+    if (!name || !amount) return;
 
     setLoading(true);
-    // Convert 'Pengeluaran' | 'Pemasukan' to match expected type if strictly needed,
-    // here we just pass the string.
     const result = await saveTransaction({
       date: new Date().toISOString(),
-      name: formData.name,
-      type: formData.type as 'Pengeluaran' | 'Pemasukan',
-      amount: Number(formData.amount)
+      name: name,
+      type: type as 'Pengeluaran' | 'Pemasukan',
+      amount: Number(amount)
     });
 
     setLoading(false);
@@ -35,6 +35,23 @@ export default function QuickAdd() {
       setStatus('error');
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await processSubmission(formData.name, formData.type, formData.amount);
+  };
+
+  // Auto-submit functionality
+  useEffect(() => {
+    const auto = searchParams.get('auto');
+    const name = searchParams.get('name');
+    const amount = searchParams.get('amount');
+    const type = searchParams.get('type') || 'Pengeluaran';
+
+    if (auto === 'true' && name && amount) {
+      processSubmission(name, type, amount);
+    }
+  }, []); // Run once on mount
 
   return (
     <Layout title="Quick Quick">
@@ -49,7 +66,7 @@ export default function QuickAdd() {
               name="type" 
               value="Pengeluaran" 
               checked={formData.type === 'Pengeluaran'}
-              onChange={(e) => setFormData({...formData, type: e.target.value})}
+              onChange={(e) => setFormData({...formData, type: e.target.value as 'Pengeluaran' | 'Pemasukan'})}
               className="hidden"
             />
             EXPENSE
@@ -61,7 +78,7 @@ export default function QuickAdd() {
               name="type" 
               value="Pemasukan" 
               checked={formData.type === 'Pemasukan'}
-              onChange={(e) => setFormData({...formData, type: e.target.value})}
+              onChange={(e) => setFormData({...formData, type: e.target.value as 'Pengeluaran' | 'Pemasukan'})}
               className="hidden"
             />
             INCOME
@@ -118,7 +135,6 @@ export default function QuickAdd() {
             </>
           )}
         </button>
-
       </form>
     </Layout>
   );
